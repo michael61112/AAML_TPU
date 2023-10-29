@@ -46,6 +46,19 @@ module systolic_array
 	input busy,
 	output done,
 
+//	debug
+
+	output [31:0] inp_north0_o,
+	output [31:0] inp_north1_o,
+	output [31:0] inp_north2_o,
+	output [31:0] inp_north3_o,
+	output [31:0] inp_west0_o, 
+	output [31:0] inp_west4_o, 
+	output [31:0] inp_west8_o, 
+	output [31:0] inp_west12_o,
+//
+
+
 	input [DATA_BITS-1:0] local_buffer_A0,
 	input [DATA_BITS-1:0] local_buffer_A1,
 	input [DATA_BITS-1:0] local_buffer_A2,
@@ -66,11 +79,23 @@ module systolic_array
 	reg [2:0] 							state;
 	reg	done_temp;
 	
+	assign state_SA_o = state;
+
 	wire [31:0] inp_north0, inp_north1, inp_north2, inp_north3;
 	wire [31:0] inp_west0, inp_west4, inp_west8, inp_west12;
 	wire [31:0] outp_south0, outp_south1, outp_south2, outp_south3, outp_south4, outp_south5, outp_south6, outp_south7, outp_south8, outp_south9, outp_south10, outp_south11, outp_south12, outp_south13, outp_south14, outp_south15;
 	wire [31:0] outp_east0, outp_east1, outp_east2, outp_east3, outp_east4, outp_east5, outp_east6, outp_east7, outp_east8, outp_east9, outp_east10, outp_east11, outp_east12, outp_east13, outp_east14, outp_east15;
-	
+	// debug
+
+	assign inp_north0_o = inp_north0;
+	assign inp_north1_o = inp_north1;
+	assign inp_north2_o = inp_north2;
+	assign inp_north3_o = inp_north3;
+	assign inp_west0_o = inp_west0;
+	assign inp_west4_o = inp_west4;
+	assign inp_west8_o = inp_west8;
+	assign inp_west12_o = inp_west12;
+
 	
 	//from north and west
 	block P0 (inp_north0, inp_west0, clk, rst, outp_south0, outp_east0, result0);

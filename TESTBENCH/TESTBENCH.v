@@ -5,10 +5,11 @@
 // authors: nober  (nobertai.c@nycu.edu.tw                                    //
 //============================================================================//
 
-
 `timescale 1ns/10ps
 `include "PATTERN.v"
 `include "TPU.v"
+
+
 
 module TESTBENCH;
 
@@ -18,6 +19,27 @@ module TESTBENCH;
 wire            clk, rst_n;
 wire [2:0]      state_TPU_o;
 wire [2:0]      state_SA_o;
+
+
+wire [31:0] local_buffer_A0_o;
+wire [31:0] local_buffer_A1_o;
+wire [31:0] local_buffer_A2_o;
+wire [31:0] local_buffer_A3_o;
+
+wire [31:0] local_buffer_B0_o;
+wire [31:0] local_buffer_B1_o;
+wire [31:0] local_buffer_B2_o;
+wire [31:0] local_buffer_B3_o;
+
+wire [7:0] inp_north0_o;
+wire [7:0] inp_north1_o;
+wire [7:0] inp_north2_o;
+wire [7:0] inp_north3_o;
+wire [7:0] inp_west0_o;
+wire [7:0] inp_west4_o; 
+wire [7:0] inp_west8_o; 
+wire [7:0] inp_west12_o;
+
 wire            in_valid;
 wire [7:0]      K;
 wire [7:0]      M;
@@ -83,6 +105,26 @@ TPU My_TPU(
     .rst_n          (rst_n),     
     .state_TPU_o    (state_TPU_o),
     .state_SA_o     (state_SA_o),
+
+    .local_buffer_A0_o(local_buffer_A0_o),
+    .local_buffer_A1_o(local_buffer_A1_o),
+    .local_buffer_A2_o(local_buffer_A2_o),
+    .local_buffer_A3_o(local_buffer_A3_o),
+
+    .local_buffer_B0_o(local_buffer_B0_o),
+    .local_buffer_B1_o(local_buffer_B1_o),
+    .local_buffer_B2_o(local_buffer_B2_o),
+    .local_buffer_B3_o(local_buffer_B3_o),
+
+	.inp_north0_o(inp_north0_o),
+	.inp_north1_o(inp_north1_o),
+	.inp_north2_o(inp_north2_o),
+	.inp_north3_o(inp_north3_o),
+	.inp_west0_o(inp_west0_o), 
+	.inp_west4_o(inp_west4_o), 
+	.inp_west8_o(inp_west8_o), 
+	.inp_west12_o(inp_west12_o),
+
     .in_valid       (in_valid),         
     .K              (K), 
     .M              (M), 

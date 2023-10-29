@@ -54,7 +54,7 @@ module TPU_fsm
 begin
 	reg [15:0]				 			i, j;
 	reg [2:0] 							state;
-	assign state_o = state;
+	assign state_TPU_o = state;
 	
 	reg A_wr_en_temp;
 	reg B_wr_en_temp;
@@ -69,8 +69,7 @@ begin
 	assign result[2] = local_buffer_C2;
 	assign result[3] = local_buffer_C3;
 
-	reg [DATA_BITS-1:0]	local_buffer_A[3:0];
-	reg [DATA_BITS-1:0]	local_buffer_B[3:0];
+
 
 	assign A_wr_en = A_wr_en_temp;
 	assign B_wr_en = B_wr_en_temp;
@@ -89,6 +88,8 @@ begin
 	assign	C_index = C_index_temp;
 	assign 	C_data_in = C_data_in_temp;
 
+	reg [DATA_BITS-1:0]	local_buffer_A[3:0];
+	reg [DATA_BITS-1:0]	local_buffer_B[3:0];
 
 	assign local_buffer_A0 = local_buffer_A[0];
 	assign local_buffer_A1 = local_buffer_A[1];
@@ -99,8 +100,27 @@ begin
 	assign local_buffer_B1 = local_buffer_B[1];
 	assign local_buffer_B2 = local_buffer_B[2];
 	assign local_buffer_B3 = local_buffer_B[3];
+/*
 
+	reg [DATA_BITS-1:0]	local_buffer_A0_temp;
+	reg [DATA_BITS-1:0]	local_buffer_A1_temp;
+	reg [DATA_BITS-1:0]	local_buffer_A2_temp;
+	reg [DATA_BITS-1:0]	local_buffer_A3_temp;
+	reg [DATA_BITS-1:0]	local_buffer_B0_temp;
+	reg [DATA_BITS-1:0]	local_buffer_B1_temp;
+	reg [DATA_BITS-1:0]	local_buffer_B2_temp;
+	reg [DATA_BITS-1:0]	local_buffer_B3_temp;
 
+	assign local_buffer_A0 = local_buffer_A0_temp;
+	assign local_buffer_A1 = local_buffer_A1_temp;
+	assign local_buffer_A2 = local_buffer_A2_temp;
+	assign local_buffer_A3 = local_buffer_A3_temp;
+
+	assign local_buffer_B0 = local_buffer_B0_temp;
+	assign local_buffer_B1 = local_buffer_B1_temp;
+	assign local_buffer_B2 = local_buffer_B2_temp;
+	assign local_buffer_B3 = local_buffer_B3_temp;
+*/
 	always@(negedge clk) begin
 		if (!rst_n) begin
 			state <= S0;
@@ -167,7 +187,7 @@ begin
 				A_wr_en_temp <= 1'b0;
 				B_wr_en_temp <= 1'b0;
 				C_wr_en_temp <= 1'b0;
-				busy_temp <= 1'b0;
+				busy_temp <= 1'b1;
 				sa_rst_n_temp <= 1'b0;
 
 				A_index_temp <= i;
@@ -177,12 +197,35 @@ begin
 				A_wr_en_temp <= 1'b0;
 				B_wr_en_temp <= 1'b0;
 				C_wr_en_temp <= 1'b0;
-				busy_temp <= 1'b0;
+				busy_temp <= 1'b1;
 				sa_rst_n_temp <= 1'b0;
-
-
+				
 				local_buffer_A[i] <= A_data_out;
 				local_buffer_B[i] <= B_data_out;
+				/*
+				case (i)
+					0: begin
+						local_buffer_A0_temp <= 32'd1;
+						local_buffer_B0_temp <= B_data_out;
+					end
+					1: begin
+						local_buffer_A1_temp <= 32'd1;
+						local_buffer_B1_temp <= B_data_out;
+					end
+					2: begin
+						local_buffer_A2_temp <= 32'd2;
+						local_buffer_B2_temp <= B_data_out;
+					end
+					3: begin
+						local_buffer_A3_temp <= 32'd3;
+						local_buffer_B3_temp <= B_data_out;
+					end		
+					default: begin
+						local_buffer_A1_temp <= 32'd4;
+						local_buffer_B1_temp <= 8'hffffffff;
+					end
+				endcase
+				*/
 				i <= i + 1;
 			end
 			S3: begin

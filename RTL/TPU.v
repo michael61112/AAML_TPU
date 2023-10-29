@@ -1,11 +1,34 @@
 `include "systolic_array.v"
 `include "TPU_fsm.v"
-module TPU(
+module TPU
+#(  parameter ADDR_BITS=16, 
+	parameter DATA_BITS=32,
+	parameter DATAC_BITS=128
+)(
     clk,
     rst_n,
 
     state_TPU_o,
     state_SA_o,
+
+    local_buffer_A0_o,
+    local_buffer_A1_o,
+    local_buffer_A2_o,
+    local_buffer_A3_o,
+
+    local_buffer_B0_o,
+    local_buffer_B1_o,
+    local_buffer_B2_o,
+    local_buffer_B3_o,
+
+	inp_north0_o,
+	inp_north1_o,
+	inp_north2_o,
+	inp_north3_o,
+	inp_west0_o, 
+	inp_west4_o, 
+	inp_west8_o, 
+	inp_west12_o,
 
     in_valid,
     K,
@@ -39,6 +62,27 @@ input [7:0]      N;
 output           busy;
 output [2:0]     state_TPU_o;
 output [2:0]     state_SA_o;
+
+
+output [DATA_BITS-1:0] local_buffer_A0_o;
+output [DATA_BITS-1:0] local_buffer_A1_o;
+output [DATA_BITS-1:0] local_buffer_A2_o;
+output [DATA_BITS-1:0] local_buffer_A3_o;
+
+output [DATA_BITS-1:0] local_buffer_B0_o;
+output [DATA_BITS-1:0] local_buffer_B1_o;
+output [DATA_BITS-1:0] local_buffer_B2_o;
+output [DATA_BITS-1:0] local_buffer_B3_o;
+
+output [7:0] inp_north0_o;
+output [7:0] inp_north1_o;
+output [7:0] inp_north2_o;
+output [7:0] inp_north3_o;
+output [7:0] inp_west0_o;
+output [7:0] inp_west4_o; 
+output [7:0] inp_west8_o; 
+output [7:0] inp_west12_o;
+
 output           A_wr_en;
 output [15:0]    A_index;
 output [31:0]    A_data_in;
@@ -75,6 +119,15 @@ wire offset_K;
 wire    [3:0]  count;
 
 
+assign local_buffer_A0_o = local_buffer_A0;
+assign local_buffer_A1_o = local_buffer_A1;
+assign local_buffer_A2_o = local_buffer_A2;
+assign local_buffer_A3_o = local_buffer_A3;
+
+assign local_buffer_B0_o = local_buffer_B0;
+assign local_buffer_B1_o = local_buffer_B1;
+assign local_buffer_B2_o = local_buffer_B2;
+assign local_buffer_B3_o = local_buffer_B3;
 //assign busy = 1'b0;
 /*
 always@(*) begin
@@ -90,7 +143,14 @@ assign offset_K = accuminate_time_K;
 assign count
 */
 wire sa_rst_n;
-
+wire [DATA_BITS-1:0]	local_buffer_A0;
+wire [DATA_BITS-1:0]	local_buffer_A1;
+wire [DATA_BITS-1:0]	local_buffer_A2;
+wire [DATA_BITS-1:0]	local_buffer_A3;
+wire [DATA_BITS-1:0]	local_buffer_B0;
+wire [DATA_BITS-1:0]	local_buffer_B1;
+wire [DATA_BITS-1:0]	local_buffer_B2;
+wire [DATA_BITS-1:0]	local_buffer_B3;
 TPU_fsm TPU_fsm1(
     .clk(clk),
 	.rst_n(rst_n),
@@ -140,6 +200,17 @@ systolic_array systolic_array1(
     .state_SA_o(state_SA_o),
     .busy(busy),
 	.done(done),
+
+// debug
+	.inp_north0_o(inp_north0_o),
+	.inp_north1_o(inp_north1_o),
+	.inp_north2_o(inp_north2_o),
+	.inp_north3_o(inp_north3_o),
+	.inp_west0_o(inp_west0_o), 
+	.inp_west4_o(inp_west4_o), 
+	.inp_west8_o(inp_west8_o), 
+	.inp_west12_o(inp_west12_o),
+
 
 	.local_buffer_A0(local_buffer_A0),
 	.local_buffer_A1(local_buffer_A1),

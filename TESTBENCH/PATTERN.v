@@ -206,7 +206,7 @@ task reset_task ; begin
         $display("         Output signal should be 0 after initial RESET at %8t   ", $time);
         $display("----------------------------------------------------------------");
         #(100);
-        $finish;
+        //$finish;
     end
 
     #(`CYCLE_TIME); rst_n = 1;
@@ -229,7 +229,7 @@ task read_A_Matrix; begin
     for(i=0;i<nrow;i=i+1) begin
         $fscanf(in_fd, "%h %h %h %h", rbuf[3], rbuf[2], rbuf[1], rbuf[0]);
         gbuff_A.gbuff[i] = {rbuf[3], rbuf[2], rbuf[1], rbuf[0]};
-         $display("A[%d] = %8h", i, gbuff_A.gbuff[i]);
+        $display("A[%d] = %h", i, gbuff_A.gbuff[i]);
     end
 
 end endtask
@@ -242,7 +242,7 @@ task read_B_Matrix; begin
     for(i=0;i<nrow;i=i+1) begin
         $fscanf(in_fd, "%h %h %h %h", rbuf[3], rbuf[2], rbuf[1], rbuf[0]);
         gbuff_B.gbuff[i] = {rbuf[3], rbuf[2], rbuf[1], rbuf[0]};
-         $display("B[%d] = %8h", i, gbuff_B.gbuff[i]);
+        $display("B[%d] = %h", i, gbuff_B.gbuff[i]);
     end
 
 end endtask
@@ -356,7 +356,7 @@ task wrong_ans; begin
     $display("----------------------------------------------------------------------------------------");
     $display("                             Unfortunately, your answer is wrong                        ");
     $display("----------------------------------------------------------------------------------------");
-    $finish;
+    //$finish;
 end endtask
 
 
@@ -438,7 +438,7 @@ task YOU_PASS_task; begin
 	$display ("                                           Your clock period = %.1f ns        					                     ", `CYCLE_TIME);
 	$display ("                                           Your total latency = %.1f ns         						                 ", total_cycles*`CYCLE_TIME);
 	$display ("----------------------------------------------------------------------------------------------------------------------");
-	$finish;
+	//$finish;
 end endtask
 
 
