@@ -16,6 +16,8 @@ module TESTBENCH;
 
 //* CHIP io wires
 wire            clk, rst_n;
+wire [2:0]      state_TPU_o;
+wire [2:0]      state_SA_o;
 wire            in_valid;
 wire [7:0]      K;
 wire [7:0]      M;
@@ -79,6 +81,8 @@ PATTERN My_Pattern(
 TPU My_TPU(
     .clk            (clk),     
     .rst_n          (rst_n),     
+    .state_TPU_o    (state_TPU_o),
+    .state_SA_o     (state_SA_o),
     .in_valid       (in_valid),         
     .K              (K), 
     .M              (M), 
