@@ -168,7 +168,12 @@ end
 				end
 				S4: begin
 					if (j == 4) begin
-						state <= S8;
+						if (Moffset_times == check_Moffset_times) begin
+							state <= S0;
+						end	
+						else begin
+							state <= S8;
+						end
 					end
 					else begin
 						state <= S5;
@@ -189,12 +194,7 @@ end
 					state <= S1;
 				end
 				S8: begin
-					if (Moffset_times == check_Moffset_times) begin
-						state <= S0;
-					end
-					else begin
-						state <= S1;
-					end
+					state <= S1;
 				end
 				default: begin 
 					state <= S0;
