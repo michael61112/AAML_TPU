@@ -8,7 +8,8 @@ module TPU_fsm
 	parameter S3 = 3'b011,
 	parameter S4 = 3'b100,
 	parameter S5 = 3'b101,
-	parameter S6 = 3'b110
+	parameter S6 = 3'b110,
+	parameter S7 = 3'b111
 )
 (
 	// Global Signals 
@@ -53,6 +54,7 @@ module TPU_fsm
 );
 begin
 	reg [15:0]				 			i, j;
+	integer								t;
 	reg [2:0] 							state;
 	assign state_TPU_o = state;
 	
@@ -61,15 +63,33 @@ begin
 	reg C_wr_en_temp;
 	reg busy_temp;
 	reg sa_rst_n_temp;
-	
-	wire [DATAC_BITS-1:0] result[3:0];
-	
-	assign result[0] = local_buffer_C0;
-	assign result[1] = local_buffer_C1;
-	assign result[2] = local_buffer_C2;
-	assign result[3] = local_buffer_C3;
 
+	reg [DATAC_BITS-1:0] result[3:0];
+	wire [DATAC_BITS-1:0] result_temp[3:0];
+	
+	assign result_temp[0] = local_buffer_C0;
+	assign result_temp[1] = local_buffer_C1;
+	assign result_temp[2] = local_buffer_C2;
+/*
+	reg [7:0]    K_reg;
+	reg [7:0]    M_reg;
+	reg [7:0]    N_reg;
+	*/
+	assign result_temp[3] = local_buffer_C3;
 
+	reg [5:0] check_Koffset_times;
+	reg [5:0] Koffset_times;
+	reg [7:0] Koffset;
+
+	//assign check_Koffset_times = (K==4) ? 0 : (K>>2);
+always @(posedge clk) begin
+		if(in_valid) begin
+			/*K_reg <= K;
+			M_reg <= M;
+			N_reg <= N;*/
+			check_Koffset_times <= (K==4) ? 0 : (K>>2);
+		end
+end
 
 	assign A_wr_en = A_wr_en_temp;
 	assign B_wr_en = B_wr_en_temp;
@@ -100,27 +120,7 @@ begin
 	assign local_buffer_B1 = local_buffer_B[1];
 	assign local_buffer_B2 = local_buffer_B[2];
 	assign local_buffer_B3 = local_buffer_B[3];
-/*
 
-	reg [DATA_BITS-1:0]	local_buffer_A0_temp;
-	reg [DATA_BITS-1:0]	local_buffer_A1_temp;
-	reg [DATA_BITS-1:0]	local_buffer_A2_temp;
-	reg [DATA_BITS-1:0]	local_buffer_A3_temp;
-	reg [DATA_BITS-1:0]	local_buffer_B0_temp;
-	reg [DATA_BITS-1:0]	local_buffer_B1_temp;
-	reg [DATA_BITS-1:0]	local_buffer_B2_temp;
-	reg [DATA_BITS-1:0]	local_buffer_B3_temp;
-
-	assign local_buffer_A0 = local_buffer_A0_temp;
-	assign local_buffer_A1 = local_buffer_A1_temp;
-	assign local_buffer_A2 = local_buffer_A2_temp;
-	assign local_buffer_A3 = local_buffer_A3_temp;
-
-	assign local_buffer_B0 = local_buffer_B0_temp;
-	assign local_buffer_B1 = local_buffer_B1_temp;
-	assign local_buffer_B2 = local_buffer_B2_temp;
-	assign local_buffer_B3 = local_buffer_B3_temp;
-*/
 	always@(negedge clk) begin
 		if (!rst_n) begin
 			state <= S0;
@@ -147,7 +147,7 @@ begin
 				end
 				S3: begin
 					if (done) begin
-						state <= S4;
+						state <= S6;
 					end
 					else begin
 						state <= S3;
@@ -163,6 +163,17 @@ begin
 				end
 				S5: begin
 					state <= S4;
+				end
+				S6: begin
+					if(Koffset_times == check_Koffset_times) begin
+						state <= S4;
+					end
+					else begin
+						state <= S7;
+					end
+				end
+				S7: begin
+					state <= S1;
 				end
 				default: begin 
 					state <= S0;
@@ -182,6 +193,10 @@ begin
 				sa_rst_n_temp <= 1'b0;
 				i=0;
 				j=0;
+				for (t = 0; t <4; t = t + 1)
+					result[t] <= 128'b0;
+				Koffset_times <= 0;
+				Koffset <= 0;
 			end
 			S1: begin
 				A_wr_en_temp <= 1'b0;
@@ -190,8 +205,8 @@ begin
 				busy_temp <= 1'b1;
 				sa_rst_n_temp <= 1'b0;
 
-				A_index_temp <= i;
-				B_index_temp <= i;
+				A_index_temp <= i + Koffset;
+				B_index_temp <= i + Koffset;
 			end
 			S2: begin
 				A_wr_en_temp <= 1'b0;
@@ -202,30 +217,7 @@ begin
 				
 				local_buffer_A[i] <= A_data_out;
 				local_buffer_B[i] <= B_data_out;
-				/*
-				case (i)
-					0: begin
-						local_buffer_A0_temp <= 32'd1;
-						local_buffer_B0_temp <= B_data_out;
-					end
-					1: begin
-						local_buffer_A1_temp <= 32'd1;
-						local_buffer_B1_temp <= B_data_out;
-					end
-					2: begin
-						local_buffer_A2_temp <= 32'd2;
-						local_buffer_B2_temp <= B_data_out;
-					end
-					3: begin
-						local_buffer_A3_temp <= 32'd3;
-						local_buffer_B3_temp <= B_data_out;
-					end		
-					default: begin
-						local_buffer_A1_temp <= 32'd4;
-						local_buffer_B1_temp <= 8'hffffffff;
-					end
-				endcase
-				*/
+
 				i <= i + 1;
 			end
 			S3: begin
@@ -253,6 +245,27 @@ begin
 
 				C_data_in_temp <= result[j];
 				j <= j + 1;
+			end
+			S6: begin
+				A_wr_en_temp <= 1'b0;
+				B_wr_en_temp <= 1'b0;
+				C_wr_en_temp <= 1'b0;
+				busy_temp <= 1'b1;
+				sa_rst_n_temp <= 1'b1;
+
+				for (t = 0; t < 4; t = t + 1)
+					result[t] <= result[t] + result_temp[t];
+				
+			end
+			S7: begin
+				A_wr_en_temp <= 1'b0;
+				B_wr_en_temp <= 1'b0;
+				C_wr_en_temp <= 1'b0;
+				busy_temp <= 1'b1;
+				sa_rst_n_temp <= 1'b1;
+
+				Koffset_times <= Koffset_times + 1;
+				Koffset <= Koffset + 4;
 			end
 		endcase
 	end
