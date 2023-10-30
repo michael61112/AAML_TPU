@@ -17,7 +17,7 @@ module TESTBENCH;
 
 //* CHIP io wires
 wire            clk, rst_n;
-wire [2:0]      state_TPU_o;
+wire [3:0]      state_TPU_o;
 wire [2:0]      state_SA_o;
 
 

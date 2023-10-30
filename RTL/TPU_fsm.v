@@ -2,20 +2,22 @@ module TPU_fsm
 #(  parameter ADDR_BITS=16, 
 	parameter DATA_BITS=32,
 	parameter DATAC_BITS=128,
-	parameter S0 = 3'b000,
-	parameter S1 = 3'b001,
-	parameter S2 = 3'b010,
-	parameter S3 = 3'b011,
-	parameter S4 = 3'b100,
-	parameter S5 = 3'b101,
-	parameter S6 = 3'b110,
-	parameter S7 = 3'b111
+	parameter S0 = 4'b0000,
+	parameter S1 = 4'b0001,
+	parameter S2 = 4'b0010,
+	parameter S3 = 4'b0011,
+	parameter S4 = 4'b0100,
+	parameter S5 = 4'b0101,
+	parameter S6 = 4'b0110,
+	parameter S7 = 4'b0111,
+	parameter S8 = 4'b1000
+
 )
 (
 	// Global Signals 
 	input   wire                     	clk,
 	input   wire                     	rst_n,
-	output  wire [2:0] 			 	    state_TPU_o,
+	output  wire [3:0] 			 	    state_TPU_o,
     input            					in_valid,
 	input								done,
     input [7:0]      					K,
@@ -55,7 +57,7 @@ module TPU_fsm
 begin
 	reg [15:0]				 			i, j;
 	integer								t;
-	reg [2:0] 							state;
+	reg [3:0] 							state;
 	assign state_TPU_o = state;
 	
 	reg A_wr_en_temp;
@@ -78,9 +80,18 @@ begin
 	assign result_temp[3] = local_buffer_C3;
 
 	reg [5:0] check_Koffset_times;
-	reg [5:0] Koffset_times;
-	reg [7:0] Koffset;
+	reg [5:0] check_Moffset_times;
+	reg [5:0] check_Noffset_times;
 
+	reg [5:0] Koffset_times;
+	reg [5:0] Moffset_times;
+	reg [5:0] Noffset_times;
+
+	reg [7:0] Koffset;
+	reg [7:0] Moffset;
+	reg [7:0] Noffset;
+
+	reg [ADDR_BITS-1:0] Moffset_index_o;
 	//assign check_Koffset_times = (K==4) ? 0 : (K>>2);
 always @(posedge clk) begin
 		if(in_valid) begin
@@ -88,6 +99,8 @@ always @(posedge clk) begin
 			M_reg <= M;
 			N_reg <= N;
 			check_Koffset_times <= (K==4) ? 0 : (K>>2);
+			check_Moffset_times <= (M==4) ? 0 : (M>>2);
+			check_Noffset_times <= (N==4) ? 0 : (N>>2);
 		end
 end
 
@@ -155,7 +168,7 @@ end
 				end
 				S4: begin
 					if (j == 4) begin
-						state <= S0;
+						state <= S8;
 					end
 					else begin
 						state <= S5;
@@ -174,6 +187,14 @@ end
 				end
 				S7: begin
 					state <= S1;
+				end
+				S8: begin
+					if (Moffset_times == check_Moffset_times) begin
+						state <= S0;
+					end
+					else begin
+						state <= S1;
+					end
 				end
 				default: begin 
 					state <= S0;
@@ -197,6 +218,10 @@ end
 					result[t] <= 128'b0;
 				Koffset_times <= 0;
 				Koffset <= 0;
+				
+				Moffset_times <= 0;
+				Moffset <= 0;
+				Moffset_index_o <= 0;
 			end
 			S1: begin
 				A_wr_en_temp <= 1'b0;
@@ -205,7 +230,7 @@ end
 				busy_temp <= 1'b1;
 				sa_rst_n_temp <= 1'b0;
 
-				A_index_temp <= i + Koffset;
+				A_index_temp <= i + Koffset + Moffset;
 				B_index_temp <= i + Koffset;
 			end
 			S2: begin
@@ -214,7 +239,7 @@ end
 				C_wr_en_temp <= 1'b0;
 				busy_temp <= 1'b1;
 				sa_rst_n_temp <= 1'b0;
-				if ( A_index_temp < K_reg) begin
+				if ( A_index_temp < K_reg * (Moffset_times+1)) begin
 					local_buffer_A[i] <= A_data_out;
 					local_buffer_B[i] <= B_data_out;
 				end
@@ -238,7 +263,7 @@ end
 				busy_temp <= 1'b1;
 				sa_rst_n_temp <= 1'b1;
 
-				C_index_temp = j;
+				C_index_temp = j + Moffset_index_o;
 			end
 			S5: begin
 				A_wr_en_temp <= 1'b0;
@@ -271,6 +296,23 @@ end
 				Koffset_times <= Koffset_times + 1;
 				Koffset <= Koffset + 4;
 				i <= 0;
+			end
+			S8: begin
+				A_wr_en_temp <= 1'b0;
+				B_wr_en_temp <= 1'b0;
+				C_wr_en_temp <= 1'b0;
+				busy_temp <= 1'b1;
+				sa_rst_n_temp <= 1'b0;
+				i=0;
+				j=0;
+				for (t = 0; t <4; t = t + 1)
+					result[t] <= 128'b0;
+				Koffset_times <= 0;
+				Koffset <= 0;
+
+				Moffset_times <= Moffset_times + 1;
+				Moffset <= Moffset + K_reg;
+				Moffset_index_o <= Moffset_index_o + 4;
 			end
 		endcase
 	end
