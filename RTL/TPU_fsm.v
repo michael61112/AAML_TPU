@@ -251,7 +251,7 @@ end
 				B_wr_en_temp <= 1'b0;
 				C_wr_en_temp <= 1'b0;
 				busy_temp <= 1'b1;
-				sa_rst_n_temp <= 1'b1;
+				sa_rst_n_temp <= 1'b0;
 
 				for (t = 0; t < 4; t = t + 1)
 					result[t] <= result[t] + result_temp[t];
@@ -262,10 +262,11 @@ end
 				B_wr_en_temp <= 1'b0;
 				C_wr_en_temp <= 1'b0;
 				busy_temp <= 1'b1;
-				sa_rst_n_temp <= 1'b1;
+				sa_rst_n_temp <= 1'b0;
 
 				Koffset_times <= Koffset_times + 1;
 				Koffset <= Koffset + 4;
+				i <= 0;
 			end
 		endcase
 	end
