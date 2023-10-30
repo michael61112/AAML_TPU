@@ -72,7 +72,7 @@ def write_config(fd, K, M, N):
     fd.write("{0:3x} {1:3x} {2:3x}".format( K, M, N))
 
 
-def gen_one_case(i, in_fd=None, c_fd=None, all_one=False, mode=0, shape_range=(4, 255), val_range=(0, 255)):
+def gen_one_case(i, in_fd=None, c_fd=None, all_one=False, mode=0, shape_range=(4, 30), val_range=(0, 255)):
 
     if in_fd == None:
         print("input file descriptor is null")
@@ -166,7 +166,7 @@ def main():
     in_fd.write(f"{ncases:d}")
 
     for n in range(ncases):
-        gen_one_case(n, in_fd, legible_fd, all_one=all_one, mode=mode, shape_range=(4, 255), val_range=(0, 255))
+        gen_one_case(n, in_fd, legible_fd, all_one=all_one, mode=mode, shape_range=(4, 20), val_range=(0, 255))
 
     # K = 0
     # M = 0

@@ -152,7 +152,7 @@ $display("HI HI HI HI HI");
     reset_task;
 
 
-    in_fd = $fopen("C:/Users/micha/Documents/Course/2023-fall/AML/lab3/AAML2023-Lab3/TESTBENCH/output2/input.txt", "r");
+    in_fd = $fopen("C:/Users/micha/Documents/Course/2023-fall/AML/lab3/AAML2023-Lab3/TESTBENCH/output3/input.txt", "r");
 $display("YA YA YA YA YA");
     //* PATNUM
     $fscanf(in_fd, "%d", PATNUM);

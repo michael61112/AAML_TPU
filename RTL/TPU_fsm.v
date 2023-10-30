@@ -70,11 +70,11 @@ begin
 	assign result_temp[0] = local_buffer_C0;
 	assign result_temp[1] = local_buffer_C1;
 	assign result_temp[2] = local_buffer_C2;
-/*
+
 	reg [7:0]    K_reg;
 	reg [7:0]    M_reg;
 	reg [7:0]    N_reg;
-	*/
+
 	assign result_temp[3] = local_buffer_C3;
 
 	reg [5:0] check_Koffset_times;
@@ -84,9 +84,9 @@ begin
 	//assign check_Koffset_times = (K==4) ? 0 : (K>>2);
 always @(posedge clk) begin
 		if(in_valid) begin
-			/*K_reg <= K;
+			K_reg <= K;
 			M_reg <= M;
-			N_reg <= N;*/
+			N_reg <= N;
 			check_Koffset_times <= (K==4) ? 0 : (K>>2);
 		end
 end
@@ -214,10 +214,14 @@ end
 				C_wr_en_temp <= 1'b0;
 				busy_temp <= 1'b1;
 				sa_rst_n_temp <= 1'b0;
-				
-				local_buffer_A[i] <= A_data_out;
-				local_buffer_B[i] <= B_data_out;
-
+				if ( A_index_temp < K_reg) begin
+					local_buffer_A[i] <= A_data_out;
+					local_buffer_B[i] <= B_data_out;
+				end
+				else begin
+					local_buffer_A[i] <= 32'b0;
+					local_buffer_B[i] <= 32'b0;
+				end
 				i <= i + 1;
 			end
 			S3: begin
