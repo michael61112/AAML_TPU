@@ -10,8 +10,8 @@ module TPU_fsm
 	parameter S5 = 4'b0101,
 	parameter S6 = 4'b0110,
 	parameter S7 = 4'b0111,
-	parameter S8 = 4'b1000
-
+	parameter S8 = 4'b1000,
+	parameter S9 = 4'b1001
 )
 (
 	// Global Signals 
@@ -92,6 +92,7 @@ begin
 	reg [7:0] Noffset;
 
 	reg [ADDR_BITS-1:0] Moffset_index_o;
+	reg [ADDR_BITS-1:0] Noffset_index_o;
 	//assign check_Koffset_times = (K==4) ? 0 : (K>>2);
 always @(posedge clk) begin
 		if(in_valid) begin
@@ -169,7 +170,12 @@ end
 				S4: begin
 					if (j == 4) begin
 						if (Moffset_times == check_Moffset_times) begin
-							state <= S0;
+							if (Noffset_times == check_Noffset_times) begin
+								state <= S0;
+							end
+							else begin
+								state <= S9;
+							end
 						end	
 						else begin
 							state <= S8;
@@ -194,6 +200,9 @@ end
 					state <= S1;
 				end
 				S8: begin
+					state <= S1;
+				end
+				S9: begin
 					state <= S1;
 				end
 				default: begin 
@@ -222,6 +231,10 @@ end
 				Moffset_times <= 0;
 				Moffset <= 0;
 				Moffset_index_o <= 0;
+
+				Noffset_times <= 0;
+				Noffset <= 0;
+				Noffset_index_o <= 0;
 			end
 			S1: begin
 				A_wr_en_temp <= 1'b0;
@@ -231,7 +244,7 @@ end
 				sa_rst_n_temp <= 1'b0;
 
 				A_index_temp <= i + Koffset + Moffset;
-				B_index_temp <= i + Koffset;
+				B_index_temp <= i + Koffset + Noffset;
 			end
 			S2: begin
 				A_wr_en_temp <= 1'b0;
@@ -263,7 +276,7 @@ end
 				busy_temp <= 1'b1;
 				sa_rst_n_temp <= 1'b1;
 
-				C_index_temp = j + Moffset_index_o;
+				C_index_temp = j + Moffset_index_o + Noffset_index_o;
 			end
 			S5: begin
 				A_wr_en_temp <= 1'b0;
@@ -313,6 +326,27 @@ end
 				Moffset_times <= Moffset_times + 1;
 				Moffset <= Moffset + K_reg;
 				Moffset_index_o <= Moffset_index_o + 4;
+			end
+			S9: begin
+				A_wr_en_temp <= 1'b0;
+				B_wr_en_temp <= 1'b0;
+				C_wr_en_temp <= 1'b0;
+				busy_temp <= 1'b1;
+				sa_rst_n_temp <= 1'b0;
+				i=0;
+				j=0;
+				for (t = 0; t <4; t = t + 1)
+					result[t] <= 128'b0;
+				Koffset_times <= 0;
+				Koffset <= 0;
+
+				Moffset_times <= 0;
+				Moffset <= 0;
+				Moffset_index_o <= 0;
+
+				Noffset_times <= Noffset_times + 1;
+				Noffset <= Noffset + K_reg;
+				Noffset_index_o <= Noffset_index_o + M_reg;
 			end
 		endcase
 	end
