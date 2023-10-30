@@ -21,6 +21,13 @@ module TPU
     local_buffer_B2_o,
     local_buffer_B3_o,
 
+    local_buffer_C0_o,
+    local_buffer_C1_o,
+    local_buffer_C2_o,
+    local_buffer_C3_o,
+
+    result0_o,
+
 	inp_north0_o,
 	inp_north1_o,
 	inp_north2_o,
@@ -73,6 +80,13 @@ output [DATA_BITS-1:0] local_buffer_B0_o;
 output [DATA_BITS-1:0] local_buffer_B1_o;
 output [DATA_BITS-1:0] local_buffer_B2_o;
 output [DATA_BITS-1:0] local_buffer_B3_o;
+
+output [DATAC_BITS-1:0] local_buffer_C0_o;
+output [DATAC_BITS-1:0] local_buffer_C1_o;
+output [DATAC_BITS-1:0] local_buffer_C2_o;
+output [DATAC_BITS-1:0] local_buffer_C3_o;
+
+output [31:0] result0_o;
 
 output [7:0] inp_north0_o;
 output [7:0] inp_north1_o;
@@ -128,6 +142,11 @@ assign local_buffer_B0_o = local_buffer_B0;
 assign local_buffer_B1_o = local_buffer_B1;
 assign local_buffer_B2_o = local_buffer_B2;
 assign local_buffer_B3_o = local_buffer_B3;
+
+assign local_buffer_C0_o = local_buffer_C0;
+assign local_buffer_C1_o = local_buffer_C1;
+assign local_buffer_C2_o = local_buffer_C2;
+assign local_buffer_C3_o = local_buffer_C3;
 //assign busy = 1'b0;
 /*
 always@(*) begin
@@ -151,6 +170,10 @@ wire [DATA_BITS-1:0]	local_buffer_B0;
 wire [DATA_BITS-1:0]	local_buffer_B1;
 wire [DATA_BITS-1:0]	local_buffer_B2;
 wire [DATA_BITS-1:0]	local_buffer_B3;
+wire [DATAC_BITS-1:0]	local_buffer_C0;
+wire [DATAC_BITS-1:0]	local_buffer_C1;
+wire [DATAC_BITS-1:0]	local_buffer_C2;
+wire [DATAC_BITS-1:0]	local_buffer_C3;
 TPU_fsm TPU_fsm1(
     .clk(clk),
 	.rst_n(rst_n),
@@ -196,7 +219,7 @@ TPU_fsm TPU_fsm1(
 systolic_array systolic_array1(
 	
 	.clk(clk),
-	.rst_n(rst_n),
+	.sa_rst_n(sa_rst_n),
     .state_SA_o(state_SA_o),
     .busy(busy),
 	.done(done),
@@ -211,7 +234,7 @@ systolic_array systolic_array1(
 	.inp_west8_o(inp_west8_o), 
 	.inp_west12_o(inp_west12_o),
 
-
+    .result0_o(result0_o),
 	.local_buffer_A0(local_buffer_A0),
 	.local_buffer_A1(local_buffer_A1),
 	.local_buffer_A2(local_buffer_A2),

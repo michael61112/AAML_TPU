@@ -31,6 +31,13 @@ wire [31:0] local_buffer_B1_o;
 wire [31:0] local_buffer_B2_o;
 wire [31:0] local_buffer_B3_o;
 
+wire [127:0] local_buffer_C0_o;
+wire [127:0] local_buffer_C1_o;
+wire [127:0] local_buffer_C2_o;
+wire [127:0] local_buffer_C3_o;
+
+wire [31:0] result0_o;
+
 wire [7:0] inp_north0_o;
 wire [7:0] inp_north1_o;
 wire [7:0] inp_north2_o;
@@ -116,6 +123,12 @@ TPU My_TPU(
     .local_buffer_B2_o(local_buffer_B2_o),
     .local_buffer_B3_o(local_buffer_B3_o),
 
+    .local_buffer_C0_o(local_buffer_C0_o),
+    .local_buffer_C1_o(local_buffer_C1_o),
+    .local_buffer_C2_o(local_buffer_C2_o),
+    .local_buffer_C3_o(local_buffer_C3_o),
+
+    .result0_o(result0_o),
 	.inp_north0_o(inp_north0_o),
 	.inp_north1_o(inp_north1_o),
 	.inp_north2_o(inp_north2_o),

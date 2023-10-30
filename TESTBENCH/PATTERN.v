@@ -152,7 +152,7 @@ $display("HI HI HI HI HI");
     reset_task;
 
 
-    in_fd = $fopen("C:/Users/micha/Documents/Course/2023-fall/AML/lab3/AAML2023-Lab3/TESTBENCH/output/input.txt", "r");
+    in_fd = $fopen("C:/Users/micha/Documents/Course/2023-fall/AML/lab3/AAML2023-Lab3/TESTBENCH/output1/input.txt", "r");
 $display("YA YA YA YA YA");
     //* PATNUM
     $fscanf(in_fd, "%d", PATNUM);
@@ -255,7 +255,7 @@ task read_golden; begin
     for(i=0;i<nrow;i=i+1) begin
         $fscanf(in_fd, "%h %h %h %h", goldenbuf[3], goldenbuf[2], goldenbuf[1], goldenbuf[0]);
         GOLDEN[i] = {goldenbuf[3], goldenbuf[2], goldenbuf[1], goldenbuf[0]};
-         $display("GOLDEN[%d] = %8h %8h %8h %8h", i, GOLDEN[i][127:96],  GOLDEN[i][95:64],  GOLDEN[i][63:32],  GOLDEN[i][31:0]);
+         $display("GOLDEN[%d] = %h %h %h %h", i, GOLDEN[i][127:96],  GOLDEN[i][95:64],  GOLDEN[i][63:32],  GOLDEN[i][31:0]);
     end
 
 end endtask
@@ -438,7 +438,7 @@ task YOU_PASS_task; begin
 	$display ("                                           Your clock period = %.1f ns        					                     ", `CYCLE_TIME);
 	$display ("                                           Your total latency = %.1f ns         						                 ", total_cycles*`CYCLE_TIME);
 	$display ("----------------------------------------------------------------------------------------------------------------------");
-	//$finish;
+	$finish;
 end endtask
 
 
