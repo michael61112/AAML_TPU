@@ -146,14 +146,14 @@ initial begin
     cycles = 0;
     total_cycles = 0;
 
-    force clk = 0;
-$display("HI HI HI HI HI");
+    clk = 0;//force clk = 0;
+
 
     reset_task;
 
 
-    in_fd = $fopen("C:/Users/micha/Documents/Course/2023-fall/AML/lab3/AAML2023-Lab3/TESTBENCH/output3/input.txt", "r");
-$display("YA YA YA YA YA");
+    in_fd = $fopen("C:/Users/micha/Documents/Course/2023-fall/AML/lab3/AAML2023-Lab3/TESTBENCH/output_TA/input.txt", "r");
+
     //* PATNUM
     $fscanf(in_fd, "%d", PATNUM);
 
@@ -206,11 +206,11 @@ task reset_task ; begin
         $display("         Output signal should be 0 after initial RESET at %8t   ", $time);
         $display("----------------------------------------------------------------");
         #(100);
-        //$finish;
+        $finish;
     end
 
     #(`CYCLE_TIME); rst_n = 1;
-    release clk;
+    //release clk;
 end endtask
 
 
