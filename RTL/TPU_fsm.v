@@ -54,7 +54,7 @@ module TPU_fsm
 	input [DATAC_BITS-1:0] local_buffer_C2,
 	input [DATAC_BITS-1:0] local_buffer_C3
 );
-begin
+
 	reg [15:0]				 			i, j;
 	integer								t;
 	reg [3:0] 							state;
@@ -352,6 +352,4 @@ end
 	end
 
 
-	
-end
 endmodule

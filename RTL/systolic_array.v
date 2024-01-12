@@ -24,7 +24,7 @@ SOFTWARE.
 
 */
 
-`include "block.v"
+//`include "block.v"
 module systolic_array
 #(  parameter ADDR_BITS=16, 
 	parameter DATA_BITS=32,

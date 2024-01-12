@@ -1,5 +1,5 @@
-`include "systolic_array.v"
-`include "TPU_fsm.v"
+//`include "systolic_array.v"
+//`include "TPU_fsm.v"
 module TPU
 #(  parameter ADDR_BITS=16, 
 	parameter DATA_BITS=32,

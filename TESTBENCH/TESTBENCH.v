@@ -6,8 +6,8 @@
 //============================================================================//
 
 `timescale 1ns/10ps
-`include "PATTERN.v"
-`include "TPU.v"
+//`include "PATTERN.v"
+//`include "TPU.v"
 
 
 

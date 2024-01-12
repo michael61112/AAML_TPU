@@ -1,9 +1,4 @@
-
-
 `define CYCLE_TIME 20.0
-
-`include "global_buffer.v"
-
 
 module PATTERN(
     clk,
@@ -31,7 +26,6 @@ module PATTERN(
     C_data_out
 );
 
-
 output reg          clk;
 output reg          rst_n;
 
@@ -40,7 +34,6 @@ output reg [7:0]    K;
 output reg [7:0]    M;
 output reg [7:0]    N;
 input               busy;
-
 
 input               A_wr_en;
 input      [15:0]   A_index;
@@ -57,10 +50,6 @@ input      [15:0]   C_index;
 input      [127:0]  C_data_in;
 output     [127:0]  C_data_out;
 
-
-// parameter PATNUM = 1000;
-
-
 integer PATNUM;
 
 integer cycles;
@@ -70,13 +59,9 @@ integer patcount;
 integer nrow;
 integer i, j, k;
 integer err;
-
+integer temp;
 
 real CYCLE;
-
-
-
-
 
 reg [127:0] GOLDEN [65535:0];
 
@@ -86,12 +71,8 @@ reg [7:0] K_golden;
 reg [7:0] M_golden;
 reg [7:0] N_golden;
 
-
-
 initial CYCLE = `CYCLE_TIME;
 always #(CYCLE/2.0) clk = ~clk;
-
-
 
 global_buffer #(
     .ADDR_BITS(16),
@@ -118,7 +99,6 @@ global_buffer #(
     .data_out(B_data_out)
 );
 
-
 global_buffer #(
     .ADDR_BITS(16),
     .DATA_BITS(128)
@@ -130,11 +110,6 @@ global_buffer #(
     .data_in(C_data_in),
     .data_out(C_data_out)
 );
-
-
-
-
-
 
 initial begin
 
@@ -148,14 +123,12 @@ initial begin
 
     clk = 0;//force clk = 0;
 
-
     reset_task;
-
 
     in_fd = $fopen("C:/Users/micha/Documents/Course/2023-fall/AML/lab3/AAML2023-Lab3/TESTBENCH/output_TA/input.txt", "r");
 
     //* PATNUM
-    $fscanf(in_fd, "%d", PATNUM);
+    temp = $fscanf(in_fd, "%d", PATNUM);
 
     for(patcount = 0; patcount < PATNUM; patcount = patcount + 1) begin
 
@@ -214,11 +187,10 @@ task reset_task ; begin
 end endtask
 
 
-
 task read_KMN; begin
-    $fscanf(in_fd, "%h", K_golden);
-    $fscanf(in_fd, "%h", M_golden);
-    $fscanf(in_fd, "%h", N_golden);
+    temp = $fscanf(in_fd, "%h", K_golden);
+    temp = $fscanf(in_fd, "%h", M_golden);
+    temp = $fscanf(in_fd, "%h", N_golden);
 end endtask
 
 
@@ -227,7 +199,7 @@ task read_A_Matrix; begin
     nrow = (M_golden[1:0] !== 2'b00) ?  K_golden * ((M_golden>>2) + 1) : K_golden * (M_golden>>2);
     
     for(i=0;i<nrow;i=i+1) begin
-        $fscanf(in_fd, "%h %h %h %h", rbuf[3], rbuf[2], rbuf[1], rbuf[0]);
+        temp = $fscanf(in_fd, "%h %h %h %h", rbuf[3], rbuf[2], rbuf[1], rbuf[0]);
         gbuff_A.gbuff[i] = {rbuf[3], rbuf[2], rbuf[1], rbuf[0]};
         $display("A[%d] = %h", i, gbuff_A.gbuff[i]);
     end
@@ -240,7 +212,7 @@ task read_B_Matrix; begin
     nrow = (N_golden[1:0] !== 2'b00) ? K_golden * ((N_golden >> 2) + 1) : K_golden * (N_golden >> 2);
 
     for(i=0;i<nrow;i=i+1) begin
-        $fscanf(in_fd, "%h %h %h %h", rbuf[3], rbuf[2], rbuf[1], rbuf[0]);
+        temp = $fscanf(in_fd, "%h %h %h %h", rbuf[3], rbuf[2], rbuf[1], rbuf[0]);
         gbuff_B.gbuff[i] = {rbuf[3], rbuf[2], rbuf[1], rbuf[0]};
         $display("B[%d] = %h", i, gbuff_B.gbuff[i]);
     end
@@ -253,7 +225,7 @@ task read_golden; begin
     nrow = (N_golden[1:0] !== 2'b00) ? M_golden * ((N_golden>>2) + 1) : M_golden * (N_golden>>2);
 
     for(i=0;i<nrow;i=i+1) begin
-        $fscanf(in_fd, "%h %h %h %h", goldenbuf[3], goldenbuf[2], goldenbuf[1], goldenbuf[0]);
+        temp = $fscanf(in_fd, "%h %h %h %h", goldenbuf[3], goldenbuf[2], goldenbuf[1], goldenbuf[0]);
         GOLDEN[i] = {goldenbuf[3], goldenbuf[2], goldenbuf[1], goldenbuf[0]};
          $display("GOLDEN[%d] = %h %h %h %h", i, GOLDEN[i][127:96],  GOLDEN[i][95:64],  GOLDEN[i][63:32],  GOLDEN[i][31:0]);
     end
@@ -275,8 +247,6 @@ task wait_finished; begin
 end endtask
 
 
-
-
 task exceed_1500000_cycles; begin
     $display ("------------------------------------------------------------------------------------");
     $display ("                               exceed 1500000 cycles, (%d) wrong                      ", cycles);
@@ -284,7 +254,6 @@ task exceed_1500000_cycles; begin
     repeat(10)@(negedge clk);
     $finish;
 end endtask
-
 
 
 task golden_check; begin
